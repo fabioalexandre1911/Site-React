@@ -41,7 +41,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           log-level: verbose
           timeout: 60000
-          local-dir: ./build/
+          local-dir: ./build
           server-dir: /public_html/site/
           port: 21
           protocol: ftp
