@@ -73,5 +73,5 @@ Para visualizar uma prévia do projeto <a href="https://portfolio-fabio-sousa.ne
 
 ## Autor
 
-| [<img src="https://avatars.githubusercontent.com/u/103857382?v=4" width=115><br><sub>Fábio Sousa</sub>](https://github.com/fabioalexandre1911) |
+| [<img src="https://avatars.githubusercontent.com/u/38870075?s=96&v=4" width=115><br><sub>Fábio Sousa</sub>](https://github.com/fabioalexandre1911) |
 | :---: |
