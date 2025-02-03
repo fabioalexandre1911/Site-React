@@ -1,6 +1,7 @@
 {
   "name": "site-pessoal",
   "private": true,
+  "homepage": "https://www.fabiosousa.dev.br/site",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
