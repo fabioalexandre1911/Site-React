@@ -1,0 +1,60 @@
+on:
+  push:
+    branches:
+      - main
+
+name: 🚀 Deploy website on push
+
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 🔨 Install dependencies and build project
+        run: |
+          npm install
+          npm run build
+
+      - name: 🔎 Verify build directory
+        run: |
+          ls -lah
+          if [ ! -d "./build" ]; then
+            echo "❌ Build folder not found! Exiting..."
+            exit 1
+          fi
+          echo "✅ Build folder exists."
+
+      - name: 📂 Upload build files to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          log-level: verbose
+          timeout: 60000
+          local-dir: ./build/
+          server-dir: /public_html/site/
+          port: 21
+          protocol: ftp
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/package-lock.json
+
+      - name: 🧹 Clear cache (optional)
+        run: curl -X GET https://www.fabiosousa.dev.br/?clear_cache=true
+
+      - name: 🔗 Test FTP Connection
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ncftp
+          ncftp -u "${{ secrets.FTP_USERNAME }}" -p "${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -c "ls"
