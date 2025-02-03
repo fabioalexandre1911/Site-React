@@ -36,9 +36,9 @@ jobs:
       - name: 📂 Upload build files to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ${{ secrets.FTP_SERVER }}  # Certifique-se de que este segredo esteja correto
+          username: ${{ secrets.FTP_USERNAME }}  # Segredo do nome de usuário
+          password: ${{ secrets.FTP_PASSWORD }}  # Segredo da senha
           log-level: verbose
           timeout: 60000
           local-dir: ./build
