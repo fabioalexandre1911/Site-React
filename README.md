@@ -66,10 +66,10 @@ npm start
 
 <br>
 
-## 💻 Demonstração
+<!-- ## 💻 Demonstração
 Para visualizar uma prévia do projeto <a href="https://portfolio-fabio-sousa.netlify.app/"><b>clique aqui</b></a>
 
-<br>
+<br> -->
 
 ## Autor
 
