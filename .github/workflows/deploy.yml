@@ -32,18 +32,19 @@ jobs:
             exit 1
           fi
           echo "✅ Build folder exists."
+
       - name: 📂 Upload build files to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}  # Certifique-se de que este segredo esteja correto
-          username: ${{ secrets.FTP_USERNAME }}  # Segredo do nome de usuário
-          password: ${{ secrets.FTP_PASSWORD }}  # Segredo da senha
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
           log-level: verbose
           timeout: 60000
           local-dir: ./build
           server-dir: /public_html/site/
           port: 21
-          protocol: ftps
+          protocol: ftp  # Ou "ftps" se necessário
           exclude: |
             **/.git*
             **/node_modules/**
@@ -54,6 +55,4 @@ jobs:
 
       - name: 🔗 Test FTP Connection
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ncftp
-          ncftp -u "${{ secrets.FTP_USERNAME }}" -p "${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_SERVER }} -c "ls"
+          curl -v --ftp-ssl ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}/
