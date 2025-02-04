@@ -43,7 +43,7 @@ jobs:
           local-dir: ./build
           server-dir: /public_html/site/
           port: 21
-          protocol: ftp
+          protocol: ftps
           exclude: |
             **/.git*
             **/node_modules/**
