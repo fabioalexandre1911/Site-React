@@ -3,16 +3,16 @@ on:
     branches:
       - main
       - development  # Adicione outras branches aqui
-      - feature/*     # Você pode usar wildcards para incluir múltiplas branches
+      - feature/*    # Suporte a múltiplas branches
   pull_request:
     branches:
       - main
-      - development  # Adicione outras branches aqui
-      - feature/*     # Você pode usar wildcards para incluir múltiplas branches
+      - development
+      - feature/*    
 
 jobs:
   deploy:
-    name: Deploy
+    name: 🚀 Deploy to FTP
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +20,7 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
+      # Passo 2: Configurar Node.js e instalar dependências
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -30,6 +31,7 @@ jobs:
           npm install
           npm run build
 
+      # Passo 3: Verificar se a pasta de build foi gerada
       - name: 🔎 Verify build directory
         run: |
           ls -lah
@@ -39,26 +41,27 @@ jobs:
           fi
           echo "✅ Build folder exists."
 
-      # Passo 2: Configurar e realizar o deploy via FTP
-      - name: 📂 Upload build files to cPanel via FTP
+      # Passo 4: Configurar e realizar o deploy via FTP
+      - name: 📂 Upload build files to FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}         # Endereço do servidor FTP
           username: ${{ secrets.FTP_USERNAME }}     # Nome de usuário do FTP
           password: ${{ secrets.FTP_PASSWORD }}     # Senha do FTP
-          port: ${{ secrets.FTP_PORT }}             # Porta do FTP, se não for a padrão (opcional)
-          local-dir: ./                             # Diretório local (geralmente o diretório onde o código está)
-          remote-dir: /public_html/site             # Diretório remoto onde os arquivos serão enviados
-          git-ftp-args: --insecure                  # Use essa opção se o servidor FTP não tiver SSL válido (opcional)
-          protocol: ftp
+          port: ${{ secrets.FTP_PORT }}             # Porta do FTP (opcional)
+          local-dir: ./build                        # Diretório local (build)
+          server-dir: /public_html/site             # Diretório remoto onde os arquivos serão enviados
           exclude: |
-            */.git
-            */.git*/*
-            */node_modules/*
-            
+            **/.git*
+            **/node_modules*
+            **/package-lock.json
+            **/README.md
+
+      # Passo 5: Opcional - Limpar cache do site
       - name: Clear cache (optional)
         run: curl -X GET https://fabiosousa.dev.br/?clear_cache=true
 
+      # Passo 6: Testar conexão FTP
       - name: Test FTP Connection
         run: |
           sudo apt-get update
