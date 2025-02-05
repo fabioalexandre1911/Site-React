@@ -1,58 +1,52 @@
+name: Deploy to FTP Server
+
 on:
   push:
     branches:
       - main
-
-name: 🚀 Deploy website on push
+      - development  # Adicione outras branches aqui
+      - feature/*     # Você pode usar wildcards para incluir múltiplas branches
+  pull_request:
+    branches:
+      - main
+      - development  # Adicione outras branches aqui
+      - feature/*     # Você pode usar wildcards para incluir múltiplas branches
 
 jobs:
-  web-deploy:
-    name: Deploy
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Passo 1: Checkout do código
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: 🔨 Install dependencies and build project
-        run: |
-          npm install
-          npm run build
-
-      - name: 🔎 Verify build directory
-        run: |
-          ls -lah
-          if [ ! -d "./build" ]; then
-            echo "❌ Build folder not found! Exiting..."
-            exit 1
-          fi
-          echo "✅ Build folder exists."
-
+      # Passo 2: Configurar e realizar o deploy via FTP
       - name: 📂 Upload build files to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          log-level: verbose
-          timeout: 60000
-          local-dir: ./build
-          server-dir: /public_html/site/
-          port: 21
-          protocol: ftp  # Ou "ftps" se necessário
+          server: ${{ secrets.FTP_SERVER }}         # Endereço do servidor FTP
+          username: ${{ secrets.FTP_USERNAME }}     # Nome de usuário do FTP
+          password: ${{ secrets.FTP_PASSWORD }}     # Senha do FTP
+          port: ${{ secrets.FTP_PORT }}             # Porta do FTP, se não for a padrão (opcional)
+          local-dir: ./                             # Diretório local (geralmente o diretório onde o código está)
+          remote-dir: /public_html/site             # Diretório remoto onde os arquivos serão enviados
+          git-ftp-args: --insecure                  # Use essa opção se o servidor FTP não tiver SSL válido (opcional)
+          protocol: ftp
           exclude: |
-            **/.git*
-            **/node_modules/**
-            **/package-lock.json
+            */.git
+            */.git*/*
+            */node_modules/*
+            
+      - name: Clear cache (optional)
+        run: curl -X GET https://fabiosousa.dev.br/?clear_cache=true
 
-      - name: 🧹 Clear cache (optional)
-        run: curl -X GET https://www.fabiosousa.dev.br/?clear_cache=true
-
-      - name: 🔗 Test FTP Connection
+      - name: Test FTP Connection
         run: |
-          curl -v --ftp-ssl ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}/
+          sudo apt-get update
+          sudo apt-get install -y ftp
+          ftp -inv ${{ secrets.FTP_HOST }} <<EOF
+          user ${{ secrets.FTP_USERNAME }} ${{ secrets.FTP_PASSWORD }}
+          ls
+          bye
+          EOF
